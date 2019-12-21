@@ -1,6 +1,5 @@
 let url = 'https://api.myjson.com/bins/1fe04i';
 let exploreResult = getData(url); //results of api request
-
 function getData(url) { //sending request to get data 
 	try {
 		let result;
@@ -20,6 +19,60 @@ function getData(url) { //sending request to get data
 	} catch (err) {
 		return err;
 	}
+}
+
+function showFriends(data, id) { // show direct friends
+	let friendsNames = [];
+	for (let i = 0; i < data[id].friends.length; i++) { // 1,3
+		friendsNames.push(data[data[id].friends[i] - 1].firstName + " " + data[data[id].friends[i] - 1].surname)
+	}
+	console.log("Friends: " + friendsNames);
+}
+
+function showFoF(data, id) { // show friends of friends
+	let fof = loopFof(data, id);
+	let filteredFof = new Set(); // filter duplicates
+	for (let i = 0; i < fof.length; i++) {
+		filteredFof.add(fof[i]);
+	}
+	console.log("Friends of friends: " + Array.from(filteredFof));
+}
+
+function showSuggested(data, id) { // show suggested friends
+	let fof = loopFof(data, id);
+	let suggested = []; // array of suggested friends
+	let obj = {}; // object helper
+	for (let i = 0; i < fof.length; i++) {
+		obj[fof[i]] = (obj[fof[i]] + 1) || 1;
+	};
+	for (let x in obj) {
+		if (obj[x] >= 2) {
+			suggested.push(x);
+		}
+	}
+	(suggested.length !== 0) ? console.log("Suggested friends: " + suggested): console.log("No friends suggestions");
+}
+
+function addListeners() { // adding listeners to buttons
+	document.body.addEventListener('click', function(evt) {
+		if (evt.target.className === 'myBtn') {
+			showFriends(exploreResult, evt.target.id);
+			showFoF(exploreResult, evt.target.id);
+			showSuggested(exploreResult, evt.target.id);
+		}
+	}, false);
+}
+
+function loopFof(data, id) { // returns unfiltered array of friends of friends
+	let friendsOfFriends = [];
+	for (let i = 0; i < data[id].friends.length; i++) {
+		for (let j = 0; j < data[data[id].friends[i] - 1].friends.length; j++) {
+			if (data[data[id].friends[i] - 1].friends[j] !== data[id].id) {
+				friendsOfFriends.push(data[[data[data[id].friends[i] - 1].friends[j]] - 1].firstName + " " + data[[data[data[id].friends[i] - 1].friends[j]] - 1].surname);
+			}
+		}
+	}
+	return friendsOfFriends;
 }
 
 function display(data) { // display contact names
@@ -45,40 +98,6 @@ function display(data) { // display contact names
           </div>
             `;
 	}
-}
-
-function showFriends(data, id) { // show direct friends
-	let friendsNames = [];
-	for (let i = 0; i < data.length; i++) {
-		names.push(data[i].firstName + " " + data[i].surname);
-		for (let j = 0; j < data[id].friends.length; j++) {
-			if (data[i].id == data[id].friends[j]) {
-				friendsNames.push(data[i].firstName + " " + data[i].surname)
-			}
-		}
-	}
-	//  console.log(friendsNames);
-}
-
-function showFoF(data, id) { // show friends of friends
-	let friendsOfFriends = [];
-	for (let i = 0; i < data[id].friends.length; i++) { //data[id].friends[i]
-		for (let j = 0; j < data[data[id].friends[i] - 1].friends.length; j++) {
-			if (data[data[id].friends[i] - 1].friends[j] !== data[id].id) {
-				friendsOfFriends.push(data[data[id].friends[i] - 1].friends[j])
-			}
-		}
-	}
-	// console.log(friendsOfFriends);
-}
-
-function addListeners() { // adding listeners to buttons
-	document.body.addEventListener('click', function(evt) {
-		if (evt.target.className === 'myBtn') {
-			showFriends(exploreResult, evt.target.id);
-			showFoF(exploreResult, evt.target.id);
-		}
-	}, false);
 }
 addListeners();
 display(exploreResult);
