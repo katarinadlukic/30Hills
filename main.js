@@ -1,10 +1,12 @@
 let url = 'https://api.myjson.com/bins/1fe04i';
 let exploreResult = getData(url); //results of api request
+let contactNames = []; // Array with names
+
 function getData(url) { //sending request to get data 
 	try {
 		let result;
 		let xmlhttp = new XMLHttpRequest();
-		xmlhttp.onreadystatechange = function() {
+		xmlhttp.onreadystatechange = function () {
 			if (xmlhttp.readyState == 4) {
 				if (xmlhttp.status == 200) {
 					result = JSON.parse(xmlhttp.response);
@@ -26,7 +28,7 @@ function showFriends(data, id) { // show direct friends
 	for (let i = 0; i < data[id].friends.length; i++) { // 1,3
 		friendsNames.push(data[data[id].friends[i] - 1].firstName + " " + data[data[id].friends[i] - 1].surname)
 	}
-	console.log("Friends: " + friendsNames);
+	return friendsNames;
 }
 
 function showFoF(data, id) { // show friends of friends
@@ -35,12 +37,12 @@ function showFoF(data, id) { // show friends of friends
 	for (let i = 0; i < fof.length; i++) {
 		filteredFof.add(fof[i]);
 	}
-	console.log("Friends of friends: " + Array.from(filteredFof));
+	return Array.from(filteredFof);
 }
 
 function showSuggested(data, id) { // show suggested friends
+	let suggested = []; 
 	let fof = loopFof(data, id);
-	let suggested = []; // array of suggested friends
 	let obj = {}; // object helper
 	for (let i = 0; i < fof.length; i++) {
 		obj[fof[i]] = (obj[fof[i]] + 1) || 1;
@@ -50,17 +52,7 @@ function showSuggested(data, id) { // show suggested friends
 			suggested.push(x);
 		}
 	}
-	(suggested.length !== 0) ? console.log("Suggested friends: " + suggested): console.log("No friends suggestions");
-}
-
-function addListeners() { // adding listeners to buttons
-	document.body.addEventListener('click', function(evt) {
-		if (evt.target.className === 'myBtn') {
-			showFriends(exploreResult, evt.target.id);
-			showFoF(exploreResult, evt.target.id);
-			showSuggested(exploreResult, evt.target.id);
-		}
-	}, false);
+	return suggested;
 }
 
 function loopFof(data, id) { // returns unfiltered array of friends of friends
@@ -75,8 +67,30 @@ function loopFof(data, id) { // returns unfiltered array of friends of friends
 	return friendsOfFriends;
 }
 
+function showInfo() { // adding listeners to buttons and displaying friends
+	document.body.addEventListener('click', function (evt) {
+		let suggested = showSuggested(exploreResult, evt.target.id);
+		let yes = "<b>Suggested friends: </b>" + suggested;
+		let no = "<b>No friends suggestions</b>";
+		if (evt.target.className === 'myBtn') {
+			document.getElementById("info").innerHTML = `<article class="message">
+			<div class="message-body">
+			  <div class="message-header">
+			        <p>${contactNames[evt.target.id]}<p>
+				</div>
+				<br>
+			  <p><b>Friends: </b>${showFriends(exploreResult, evt.target.id)}</p>
+			  <p><b>Friends of friends:</b>${showFoF(exploreResult, evt.target.id)}</p>
+			  <p>${suggested.length != 0 ? yes : no}</p>
+			</div>
+		  </article>	`
+		}
+	}, false);
+}
+
 function display(data) { // display contact names
 	for (let i = 0; i < data.length; i++) {
+		contactNames.push(data[i].firstName + " " + data[i].surname);
 		document.getElementById("display").innerHTML += `
             <div class="card"> 
             <div class="card-content">
@@ -99,5 +113,7 @@ function display(data) { // display contact names
             `;
 	}
 }
-addListeners();
+{
+showInfo();
 display(exploreResult);
+}
