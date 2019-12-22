@@ -106,7 +106,7 @@ function display(data) { // display contact names
                 </div>
               </div>
               <div class="content">       
-              <p class="subtitle is-6"><button id="${data[i].id - 1}" class="myBtn">Friends</button></p>
+              <p class="subtitle is-6"><a id="${data[i].id - 1}" class="myBtn">Friends</a></p>
               </div>
             </div>
           </div>
