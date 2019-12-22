@@ -6,7 +6,7 @@ function getData(url) { //sending request to get data
 	try {
 		let result;
 		let xmlhttp = new XMLHttpRequest();
-		xmlhttp.onreadystatechange = function () {
+		xmlhttp.onreadystatechange = function() {
 			if (xmlhttp.readyState == 4) {
 				if (xmlhttp.status == 200) {
 					result = JSON.parse(xmlhttp.response);
@@ -40,14 +40,14 @@ function showFoF(data, id) { // show friends of friends
 	};
 	for (let x in obj) { //removing duplicates
 		if (obj[x] < 2) {
-			fof.push(data[x-1].firstName + " " + data[x-1].surname);
+			fof.push(data[x - 1].firstName + " " + data[x - 1].surname);
 		}
 	}
 	return fof;
 }
 
 function showSuggested(data, id) { // show suggested friends
-	let suggested = []; 
+	let suggested = [];
 	let fof = loopFof(data, id);
 	let obj = {}; // object helper
 	for (let i = 0; i < fof.length; i++) { // finding duplicates
@@ -55,7 +55,7 @@ function showSuggested(data, id) { // show suggested friends
 	};
 	for (let x in obj) { // taking duplicates(suggested friends)
 		if (obj[x] >= 2) {
-			suggested.push(data[x-1].firstName + " " + data[x-1].surname);
+			suggested.push(data[x - 1].firstName + " " + data[x - 1].surname);
 		}
 	}
 	return suggested;
@@ -66,19 +66,19 @@ function loopFof(data, id) { // filters chosen user and direct friends from frie
 	let f = data[id].friends;
 	for (let i = 0; i < f.length; i++) {
 		for (let j = 0; j < data[f[i] - 1].friends.length; j++) {
-					if(data[data[id].friends[i] - 1].friends[j] !== data[id].id){
-						filtered.push(data[f[i] - 1].friends[j]) ;
-					}		
-			}			
+			if (data[data[id].friends[i] - 1].friends[j] !== data[id].id) {
+				filtered.push(data[f[i] - 1].friends[j]);
+			}
+		}
 	}
-	filtered = filtered.filter(function(item){
+	filtered = filtered.filter(function(item) {
 		return !f.includes(item)
 	})
 	return filtered;
 }
 
 function showInfo() { // adding listeners to buttons and displaying friends
-	document.body.addEventListener('click', function (evt) {
+	document.body.addEventListener('click', function(evt) {
 		let suggested = showSuggested(exploreResult, evt.target.id);
 		let yes = "<b>Suggested friends: </b>" + suggested;
 		let no = "<b>No friends suggestions</b>";
@@ -123,7 +123,6 @@ function display(data) { // display contact names
           </div>
             `;
 	}
-}
-{
-display(exploreResult);
+} {
+	display(exploreResult);
 }
