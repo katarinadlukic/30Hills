@@ -80,7 +80,7 @@ function showInfo() { // adding listeners to buttons and displaying friends
 				</div>
 				<br>
 			  <p><b>Friends: </b>${showFriends(exploreResult, evt.target.id)}</p>
-			  <p><b>Friends of friends:</b>${showFoF(exploreResult, evt.target.id)}</p>
+			  <p><b>Friends of friends: </b>${showFoF(exploreResult, evt.target.id)}</p>
 			  <p>${suggested.length != 0 ? yes : no}</p>
 			</div>
 		  </article>	`
