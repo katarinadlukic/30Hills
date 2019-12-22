@@ -32,39 +32,49 @@ function showFriends(data, id) { // show direct friends
 }
 
 function showFoF(data, id) { // show friends of friends
-	let fof = loopFof(data, id);
-	let filteredFof = new Set(); // filter duplicates
-	for (let i = 0; i < fof.length; i++) {
-		filteredFof.add(fof[i]);
+	let filtered = loopFof(data, id);
+	let fof = [];
+	let obj = {};
+	for (let i = 0; i < filtered.length; i++) { //finding duplicates
+		obj[filtered[i]] = (obj[filtered[i]] + 1) || 1;
+	};
+	for (let x in obj) { //removing duplicates
+		if (obj[x] < 2) {
+			fof.push(data[x-1].firstName + " " + data[x-1].surname);
+		}
 	}
-	return Array.from(filteredFof);
+	return fof;
 }
 
 function showSuggested(data, id) { // show suggested friends
 	let suggested = []; 
 	let fof = loopFof(data, id);
 	let obj = {}; // object helper
-	for (let i = 0; i < fof.length; i++) {
+	for (let i = 0; i < fof.length; i++) { // finding duplicates
 		obj[fof[i]] = (obj[fof[i]] + 1) || 1;
 	};
-	for (let x in obj) {
+	for (let x in obj) { // taking duplicates(suggested friends)
 		if (obj[x] >= 2) {
-			suggested.push(x);
+			suggested.push(data[x-1].firstName + " " + data[x-1].surname);
 		}
 	}
 	return suggested;
 }
 
-function loopFof(data, id) { // returns unfiltered array of friends of friends
-	let friendsOfFriends = [];
-	for (let i = 0; i < data[id].friends.length; i++) {
-		for (let j = 0; j < data[data[id].friends[i] - 1].friends.length; j++) {
-			if (data[data[id].friends[i] - 1].friends[j] !== data[id].id) {
-				friendsOfFriends.push(data[[data[data[id].friends[i] - 1].friends[j]] - 1].firstName + " " + data[[data[data[id].friends[i] - 1].friends[j]] - 1].surname);
-			}
-		}
+function loopFof(data, id) { // filters chosen user and direct friends from friendsOfFriends
+	let filtered = [];
+	let f = data[id].friends;
+	for (let i = 0; i < f.length; i++) {
+		for (let j = 0; j < data[f[i] - 1].friends.length; j++) {
+					if(data[data[id].friends[i] - 1].friends[j] !== data[id].id){
+						filtered.push(data[f[i] - 1].friends[j]) ;
+					}		
+			}			
 	}
-	return friendsOfFriends;
+	filtered = filtered.filter(function(item){
+		return !f.includes(item)
+	})
+	return filtered;
 }
 
 function showInfo() { // adding listeners to buttons and displaying friends
@@ -89,6 +99,7 @@ function showInfo() { // adding listeners to buttons and displaying friends
 }
 
 function display(data) { // display contact names
+	showInfo();
 	for (let i = 0; i < data.length; i++) {
 		contactNames.push(data[i].firstName + " " + data[i].surname);
 		document.getElementById("display").innerHTML += `
@@ -114,6 +125,5 @@ function display(data) { // display contact names
 	}
 }
 {
-showInfo();
 display(exploreResult);
 }
